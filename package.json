@@ -1,0 +1,19 @@
+{
+  "name": "hourly",
+  "version": "0.0.1",
+  "description": "simple node-angular app",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://codehub.aiti-kace.com.gh/owuraku/HourlyApp.git"
+  },
+  "author": "PeeZee",
+  "license": "MIT"
+}
