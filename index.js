@@ -1,56 +1,28 @@
 const express = require("express");
+const helmet = require("helmet");
+const dotenv = require("dotenv").config();
+const cors = require("cors");
+if (dotenv.error) {
+	throw new Error("ENV NOT LOADED");
+}
+const { attendanceRoutes, commonRoutes, userRoutes } = require("./routes");
+
+const _app_folder = "public";
 
 const app = express();
+app.use(helmet());
+app.use(express.json());
+app.use(cors());
 
-app.get("/", (req, res) => {
-	res.send("Hello world");
-});
+app.use("/api/", commonRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use(require("./middleware/response-structure"));
 
-app.get("/users", (req, res) => {
-	res.send(
-		JSON.stringify({
-			success: true,
-			message: "User data retrieved successfully",
-			error: null,
-			data: [
-				{ id: 1, name: "Kofi" },
-				{ id: 2, name: "Ama" }
-			]
-		})
-	);
-});
-
-app.get("/attendance", (req, res) => {
-	res.send(
-		JSON.stringify({
-			success: true,
-			message: "Attendance data retrieved successfully",
-			error: null,
-			data: [
-				{
-					id: 1,
-					userid: 1,
-					date: "2020-03-10",
-					clockin: "08:00",
-					clockout: "17:00",
-					hours: 8
-				},
-				{
-					id: 2,
-					userid: 2,
-					date: "2020-03-10",
-					clockin: "08:00",
-					clockout: "17:00",
-					hours: 8
-				}
-			]
-		})
-	);
-});
-
-app.post("/users", (req, res) => {
-	console.log(req);
-	res.send();
-});
+//all other routes go to index.html
+// app.use(express.static("public"));
+// app.use("*", (req, res) => {
+// 	res.sendFile("/", { root: _app_folder });
+// });
 
 app.listen(process.env.PORT || 3000);

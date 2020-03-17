@@ -1,0 +1,39 @@
+<div class="card">
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">User Fullname</th>
+          <th scope="col">Time In</th>
+          <th scope="col">Time Out</th>
+          <th scope="col">Hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attend of attendance">
+          <th scope="row">{{ attend.user.fullname }}</th>
+          <td>
+            {{ attend.clockin }}
+          </td>
+          <td>{{ attend.clockout }}</td>
+          <td>{{ attend.hour }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between p-2">
+      <!-- <ngb-pagination
+        [collectionSize]="collectionSize"
+        [(page)]="page"
+        [pageSize]="pageSize"
+      >
+      </ngb-pagination> -->
+
+      <!-- <select style="width: auto" [(ngModel)]="pageSize">
+        <option [ngValue]="2">2 items per page</option>
+        <option [ngValue]="4">4 items per page</option>
+        <option [ngValue]="6">6 items per page</option>
+      </select> -->
+    </div>
+  </div>
+</div>
