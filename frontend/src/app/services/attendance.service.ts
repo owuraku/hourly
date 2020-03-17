@@ -14,11 +14,16 @@ export class AttendanceService extends ResourceService {
     super(http, resourceUrl);
   }
 
-  getStats(userid: string, date: { datefrom: string; dateTo: string } | null) {
+  getStats(userid: string, date: { fromDate: any; toDate: any } | null) {
     const u = userid === "0" ? "all" : userid;
     return this.http
       .get(`${API_URL_BASE}/${resourceUrl}`, {
-        params: { user: u || "false", date: "false", filter: "true" }
+        params: {
+          user: u,
+          toDate: date.toDate,
+          fromDate: date.fromDate,
+          filter: "true"
+        }
       })
       .pipe(retry(1), catchError(super.handleError));
   }

@@ -19,11 +19,17 @@ const attendanceSchema = Joi.object({
 		.required()
 });
 
+const setErrors = (err, res) => {
+	res.locals.success = false;
+	res.locals.error = err.message;
+	res.locals.message = "Error retrieving attendance.";
+	res.locals.code = 500;
+};
+
 router.get("/", (req, res, next) => {
 	const { ...queryString } = req.query;
 	if (queryString.filter === "true") {
-		const { user } = queryString;
-		console.log(user);
+		const { user, toDate, fromDate } = queryString;
 		let m = User;
 		if (user !== "all") {
 			m = User.where("users.id", user);
@@ -35,6 +41,7 @@ router.get("/", (req, res, next) => {
 				.max("clockin as latestEntryTime")
 				.min("clockout as earliestExitTime")
 				.max("clockout as latestExitTime")
+				.whereBetween("date", [toDate, fromDate])
 				.groupBy("users.id")
 				.select("fullname", "username", "user_id")
 				.select(
@@ -53,11 +60,9 @@ router.get("/", (req, res, next) => {
 		})
 			.fetchAll()
 			.then(r => {
-				//const { attributes: d } = r;
 				res.locals.data = r;
-				//console.log(d);
 			})
-			.catch(err => (res.locals.error = err))
+			.catch(err => setErrors(err, res))
 			.finally(() => next());
 	}
 
@@ -66,13 +71,9 @@ router.get("/", (req, res, next) => {
 		.fetch({ withRelated: "user" })
 		.then(attendance => {
 			res.locals.data = attendance.mask("*,user(id,fullname)");
-			res.locals.message = "attendance retrieved successfully";
+			res.locals.message = "Attendance retrieved successfully";
 		})
-		.catch(err => {
-			res.locals.success = false;
-			res.locals.message = err;
-			res.locals.code = 500;
-		})
+		.catch(err => setErrors(err, res))
 		.finally(() => {
 			next();
 		});

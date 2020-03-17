@@ -2,11 +2,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { HttpClientModule } from "@angular/common/http";
 import { JwtModule } from "@auth0/angular-jwt";
-import {
-  NgbModule,
-  NgbCalendar,
-  NgbCalendarGregorian
-} from "@ng-bootstrap/ng-bootstrap";
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -17,6 +13,7 @@ import { AttendanceComponent } from "./components/attendance/attendance.componen
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { UnauthorizedComponent } from "./components/unauthorized/unauthorized.component";
 import { HomeComponent } from "./components/home/home.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 
 function tokenGetter() {
   return localStorage.getItem("access_token");
@@ -39,6 +36,7 @@ function tokenGetter() {
     NgbModule,
     ReactiveFormsModule,
     FormsModule,
+    FontAwesomeModule,
     HttpClientModule,
     JwtModule.forRoot({
       config: {
@@ -46,7 +44,7 @@ function tokenGetter() {
       }
     })
   ],
-  providers: [{ provide: NgbCalendar, useClass: NgbCalendarGregorian }],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

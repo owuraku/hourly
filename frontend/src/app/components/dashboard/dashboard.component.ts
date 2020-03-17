@@ -9,7 +9,11 @@ import {
   tap,
   catchError
 } from "rxjs/operators";
-import { NgbDate, NgbCalendar } from "@ng-bootstrap/ng-bootstrap";
+import {
+  NgbDate,
+  NgbCalendar,
+  NgbDateParserFormatter
+} from "@ng-bootstrap/ng-bootstrap";
 import { AttendanceService } from "src/app/services/attendance.service";
 
 interface UserDetails {
@@ -17,12 +21,24 @@ interface UserDetails {
   fullname: string;
   username: string;
 }
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
   styles: [
     `
+      input[name="datepicker"] {
+        visibility: hidden;
+      }
+
+      .form-group.hidden {
+        width: 0;
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+
       .custom-day {
         text-align: center;
         padding: 0.185rem 0.25rem;
@@ -45,7 +61,8 @@ interface UserDetails {
   ]
 })
 export class DashboardComponent implements OnInit {
-  userModel: UserDetails = { fullname: "", id: 0, username: "" };
+  faCalendar = faCalendar;
+  userModel: UserDetails = { fullname: "", id: 0, username: "All" };
   users: UserDetails[];
   userstats = [];
   searching = false;
@@ -57,17 +74,19 @@ export class DashboardComponent implements OnInit {
   constructor(
     private userService: UsersService,
     private attendanceService: AttendanceService,
-    private calendar: NgbCalendar
+    private calendar: NgbCalendar,
+    public formatterDate: NgbDateParserFormatter
   ) {
-    this.fromDate = this.calendar.getToday();
-    this.toDate = this.calendar.getNext(calendar.getToday(), "d", 20);
+    this.toDate = this.calendar.getToday();
+    this.fromDate = this.calendar.getPrev(calendar.getToday(), "d", 20);
   }
 
   ngOnInit() {
-    const d = null;
-    this.attendanceService
-      .getStats(this.userModel.id.toString(), d)
-      .subscribe((us: any) => (this.userstats = us.data as []));
+    this.updateTable();
+    // const d = null;
+    // this.attendanceService
+    //   .getStats(this.userModel.id.toString(), d)
+    //   .subscribe((us: any) => (this.userstats = us.data as []));
   }
 
   onDateSelection(date: NgbDate) {
@@ -124,15 +143,30 @@ export class DashboardComponent implements OnInit {
       tap(() => (this.searching = false))
     );
 
+  validateInput(currentValue: NgbDate, input: string): NgbDate {
+    const parsed = this.formatterDate.parse(input);
+    return parsed && this.calendar.isValid(NgbDate.from(parsed))
+      ? NgbDate.from(parsed)
+      : currentValue;
+  }
+
   updateTable() {
     if (this.userModel == null) {
-      alert("No user selected, defaulting to all");
-      this.userModel = { fullname: "all", id: 0, username: "all" };
+      // alert("No user selected, defaulting to all");
+      this.userModel = { fullname: "All", id: 0, username: "All" };
     }
+    //const toDate = this.toDate.
     this.attendanceService
-      .getStats(this.userModel.id.toString(), null)
+      .getStats(this.userModel.id.toString(), {
+        fromDate: this.returnDateString(this.toDate),
+        toDate: this.returnDateString(this.fromDate)
+      })
       .subscribe(result => {
-        this.userstats = result as any[];
+        this.userstats = (result as any).data;
       });
+  }
+
+  returnDateString(date: NgbDate) {
+    return `${date.year}-${date.month}-${date.day}`;
   }
 }
