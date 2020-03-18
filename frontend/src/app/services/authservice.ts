@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { of, Observable, throwError } from "rxjs";
 import { retry, map, catchError } from "rxjs/operators";
+import { Router } from "@angular/router";
 
 const api = "http://localhost:8000";
 
@@ -18,7 +19,11 @@ interface ResponseStructure {
   providedIn: "root"
 })
 export class AuthService {
-  constructor(private http: HttpClient, private jwt: JwtHelperService) {}
+  constructor(
+    private http: HttpClient,
+    private jwt: JwtHelperService,
+    private router: Router
+  ) {}
 
   private _login(credentials: { username: string; password: string }) {
     return this.http.post(`${api}/api/login`, credentials);
@@ -57,5 +62,6 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem("access_token");
+    this.router.navigate(["/"]);
   }
 }

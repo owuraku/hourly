@@ -1,7 +1,7 @@
 <div>
   <div class="card">
     <div class="card-header">
-      FILTER RESULTS
+      FILTER INPUT
     </div>
     <div class="card-body">
       <div class="row">
@@ -43,6 +43,7 @@
                     [dayTemplate]="t"
                     outsideDays="hidden"
                     [startDate]="fromDate"
+                    [footerTemplate]="footerTemplate"
                   />
                   <ng-template #t let-date let-focused="focused">
                     <span
@@ -80,6 +81,16 @@
                       <fa-icon [icon]="faCalendar"></fa-icon>
                     </button>
                   </div>
+                  <ng-template #footerTemplate>
+                    <hr class="my-0" />
+                    <button
+                      ngbButton
+                      class="btn btn-danger btn-sm m-2 float-right"
+                      (click)="datepicker.close()"
+                    >
+                      Close
+                    </button>
+                  </ng-template>
                 </div>
               </div>
               <div class="form-group">
@@ -138,6 +149,11 @@
           </tr>
         </thead>
         <tbody>
+          <tr *ngIf="userstats.length === 0">
+            <td colspan="10" class="text-center">
+              No data available
+            </td>
+          </tr>
           <tr *ngFor="let userstat of userstats">
             <th scope="row">{{ userstat.username }}</th>
             <td>{{ userstat.earliestEntryTime }}</td>

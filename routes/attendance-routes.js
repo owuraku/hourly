@@ -6,10 +6,10 @@ const {
 } = require("./../models/models");
 const router = express.Router();
 const testValidationError = require("./../common-functions");
-
+const admin = require("./../middleware/admin");
 const attendanceSchema = Joi.object({
 	id: Joi.number(),
-	userid: Joi.number().required(),
+	user_id: Joi.number().required(),
 	date: Joi.date().required(),
 	clockin: Joi.string()
 		.regex(/^([0-9]{2})\:([0-9]{2})$/)
@@ -26,8 +26,27 @@ const setErrors = (err, res) => {
 	res.locals.code = 500;
 };
 
-router.get("/", (req, res, next) => {
+function validateAttendance(attendance, res) {
+	const result = Joi.validate(attendance, attendanceSchema);
+	if (result.error == null) return true;
+	const {
+		error: {
+			details: [{ message: errorMessage = null }]
+		}
+	} = result;
+	if (errorMessage) {
+		res.locals.code = 422;
+		res.locals.success = false;
+		res.locals.error = errorMessage;
+		res.locals.message = "Validation Error";
+	}
+	return false;
+}
+
+router.get("/", admin, (req, res, next) => {
 	const { ...queryString } = req.query;
+
+	//to filter statistical data
 	if (queryString.filter === "true") {
 		const { user, toDate, fromDate } = queryString;
 		let m = User;
@@ -66,11 +85,45 @@ router.get("/", (req, res, next) => {
 			.finally(() => next());
 	}
 
-	//get users
-	Attendance.collection()
-		.fetch({ withRelated: "user" })
+	//attendance query
+	const attendanceQuery = Attendance.query(function(qb) {
+		qb.leftJoin("users", "users.id", "attendance.user_id")
+			.select(
+				knex.raw("HOUR( TIMEDIFF( `clockout`, `clockin` ) ) - 1 as hours")
+			)
+			//.select(knex.raw("CONVERT(varchar, date, 106) as date"))
+			.select(
+				"clockin",
+				"clockout",
+				"users.username",
+				"date",
+				"users.fullname"
+			);
+	});
+
+	//for pagination
+	if (queryString.paginate === "true") {
+		attendanceQuery
+			.fetchPage({ page: queryString.page, pageSize: queryString.pageSize })
+			.then(attendance => {
+				const data = {
+					data: attendance.toJSON(),
+					pagination: attendance.pagination
+				};
+				res.locals.data = data; //.mask("*,user(id,fullname)");
+				res.locals.message = "Attendance retrieved successfully";
+			})
+			.catch(err => setErrors(err, res))
+			.finally(() => {
+				next();
+			});
+	}
+
+	//for all results
+	attendanceQuery
+		.fetchAll()
 		.then(attendance => {
-			res.locals.data = attendance.mask("*,user(id,fullname)");
+			res.locals.data = attendance; //.mask("*,user(id,fullname)");
 			res.locals.message = "Attendance retrieved successfully";
 		})
 		.catch(err => setErrors(err, res))
@@ -91,14 +144,43 @@ router.post("/", (req, res, next) => {
 	//save to database
 	const data = req.body;
 	const attendance = {
-		userid: data.userid,
+		user_id: req.user.id,
 		date: data.date,
 		clockin: data.clockin,
 		clockout: data.clockout
 	};
-	testValidationError(attendance, attendanceSchema, res);
-	//console.log();
-	next("Success");
+
+	if (!validateAttendance(attendance, res)) {
+		next();
+	}
+
+	// Attendance.where({ date: "2020-12-12", user_id: attendance.user_id })
+	// 	.fetch({ require: false })
+	// 	.then(result => console.log(result))
+	// 	.finally(() => next());
+
+	Attendance.where({ date: attendance.date, user_id: attendance.user_id })
+		.fetch({ require: false })
+		.then(result => {
+			if (result === null) {
+				console.log("response empty-->creating");
+				Attendance.forge(attendance)
+					.save()
+					.then(result => {
+						res.locals.message = "Attendance logged successfully";
+						res.locals.data = result;
+					})
+					.catch(err => setErrors(err, res))
+					.finally(() => next());
+			} else {
+				res.locals.success = false;
+				res.locals.message = `Attendance data already available for ${attendance.date}`;
+				res.locals.code = 422;
+				next();
+			}
+		})
+		.catch(err => setErrors(err, res))
+		.finally(() => next());
 });
 
 router.put("/", (req, res, next) => {

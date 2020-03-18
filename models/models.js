@@ -15,7 +15,8 @@ const User = bookshelf.model("User", {
 		return jwt.sign(
 			{
 				name: this.attributes.fullname,
-				role: this.attributes.role
+				role: this.attributes.role,
+				id: this.attributes.id
 			},
 			process.env.APP_KEY ||
 				"$2b$10$cae294uO/E3sMcKTMPfPLuXkPRsJqVTpEA0UyN2Smpis01AY1EJgy"

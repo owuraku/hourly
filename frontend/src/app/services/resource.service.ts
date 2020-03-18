@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { API_URL_BASE as API } from "./../../environments/custom";
 import { retry, catchError } from "rxjs/operators";
 import { throwError } from "rxjs";
+import { Router } from "@angular/router";
 
 export class ResourceService {
   API_URL_BASE = API;
@@ -9,8 +10,16 @@ export class ResourceService {
   constructor(public http: HttpClient, private resourceUrl: string) {}
 
   handleError(error) {
-    if (error.statusCode === 403) {
+    if (error.status === 403) {
       alert("You are unauthorized to perform this operation");
+    }
+
+    if (error.status === 401) {
+      alert("You are unathenticated. Please log in");
+    }
+
+    if (error.status === 422) {
+      alert(error.error.message);
     }
 
     // if (error.statusCode === 403) {
@@ -25,6 +34,19 @@ export class ResourceService {
       .get(`${this.API_URL_BASE}/${this.resourceUrl}/${resourceId}`)
       .pipe(retry(1), catchError(this.handleError));
   }
+
+  getPaginatedResources(paginator: { page: number; pageSize: number }) {
+    return this.http
+      .get(`${this.API_URL_BASE}/${this.resourceUrl}`, {
+        params: {
+          paginate: "true",
+          page: paginator.page.toString() || "1",
+          pageSize: paginator.pageSize.toString() || "15"
+        }
+      })
+      .pipe(retry(1), catchError(this.handleError));
+  }
+
   getAllResources() {
     return this.http
       .get(`${this.API_URL_BASE}/${this.resourceUrl}`)

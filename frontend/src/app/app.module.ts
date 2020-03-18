@@ -1,7 +1,7 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-import { HttpClientModule } from "@angular/common/http";
-import { JwtModule } from "@auth0/angular-jwt";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { JwtModule, JwtInterceptor } from "@auth0/angular-jwt";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { AppRoutingModule } from "./app-routing.module";
@@ -14,10 +14,21 @@ import { NavbarComponent } from "./components/navbar/navbar.component";
 import { UnauthorizedComponent } from "./components/unauthorized/unauthorized.component";
 import { HomeComponent } from "./components/home/home.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { AddUserComponent } from './components/add-user/add-user.component';
+// import { JwtInterceptor } from "./services/auth-interceptor.service";
 
 function tokenGetter() {
   return localStorage.getItem("access_token");
 }
+
+const jwtConf = {
+  config: {
+    tokenGetter,
+    whitelistedDomains: ["localhost:8000"],
+    blacklistedDomains: ["localhost:8000/api/login"]
+    // throwNoTokenError: true
+  }
+};
 
 @NgModule({
   declarations: [
@@ -28,7 +39,8 @@ function tokenGetter() {
     AttendanceComponent,
     NavbarComponent,
     UnauthorizedComponent,
-    HomeComponent
+    HomeComponent,
+    AddUserComponent
   ],
   imports: [
     BrowserModule,
@@ -38,13 +50,11 @@ function tokenGetter() {
     FormsModule,
     FontAwesomeModule,
     HttpClientModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter
-      }
-    })
+    JwtModule.forRoot(jwtConf)
   ],
-  providers: [],
+  providers: [
+    // { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

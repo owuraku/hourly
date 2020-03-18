@@ -1,14 +1,71 @@
 <div class="container container-fluid">
   <!-- 1. inline datepicker -->
-  <div class="card text-center ">
+  <div class="card">
+    <div class="card-header">
+      Select date and time for attendance
+    </div>
     <div class="card-body">
       <div class="card-title">
         <b> SELECT DATE</b>
       </div>
-      <ngb-datepicker #d></ngb-datepicker>
+      <div class="row">
+        <div class="col-md-6">
+          <ngb-datepicker
+            #dp
+            [(ngModel)]="model"
+            (navigate)="date = $event.next"
+            [maxDate]="today"
+            #d
+          ></ngb-datepicker>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="clockin" ngbButtonLabel>Time In</label>
+              <ngb-timepicker
+                (ngModelChange)="clockinChange($event)"
+                name="clockin"
+                [(ngModel)]="clockin"
+              ></ngb-timepicker>
+            </div>
+            <div class="col-md-6">
+              <label for="clockout" ngbButtonLabel>TIme Out</label>
+              <ngb-timepicker
+                (ngModelChange)="clockoutChange($event)"
+                name="clockout"
+                [(ngModel)]="clockout"
+              ></ngb-timepicker>
+            </div>
+          </div>
+          <hr />
+
+          <div class="row col-md-12">
+            <label for="projects">Project Woked On</label>
+            <input
+              class="form-control"
+              type="text"
+              [(ngModel)]="project"
+              (ngModelChange)="projectChange($event)"
+              name="projects"
+              id=""
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer text-center">
+      <button
+        ngbButton
+        class="btn btn-primary"
+        [disabled]="invalidForm"
+        (click)="submitAttendance()"
+      >
+        Submit
+      </button>
     </div>
   </div>
-
-  <!-- 2. datepicker in the popup -->
-  <!-- <input type="text" ngbDatepicker #d="ngbDatepicker" /> -->
 </div>
+
+<!-- 2. datepicker in the popup -->
+<!-- <input type="text" ngbDatepicker #d="ngbDatepicker" /> -->

@@ -6,7 +6,7 @@ if (dotenv.error) {
 	throw new Error("ENV NOT LOADED");
 }
 const { attendanceRoutes, commonRoutes, userRoutes } = require("./routes");
-
+const auth = require("./middleware/auth");
 const _app_folder = "public";
 
 const app = express();
@@ -15,8 +15,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/", commonRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/attendance", attendanceRoutes);
+app.use("/api/users", auth, userRoutes);
+app.use("/api/attendance", auth, attendanceRoutes);
 app.use(require("./middleware/response-structure"));
 
 //all other routes go to index.html

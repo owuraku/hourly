@@ -29,4 +29,19 @@ export class UsersService extends ResourceService {
         catchError(super.handleError)
       );
   }
+
+  verifyUsername(username: string) {
+    return this.thisHttp
+      .get(`${API_URL_BASE}/${resourceUrl}`, {
+        params: { verify: "true", username }
+      })
+      .pipe(
+        retry(1),
+        map(
+          (val: any) =>
+            (val = val.data.available ? null : { unavailable: true })
+        ),
+        catchError(() => of({ unavailable: true }))
+      );
+  }
 }

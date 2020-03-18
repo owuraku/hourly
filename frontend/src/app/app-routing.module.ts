@@ -8,6 +8,7 @@ import { AuthGaurdService } from "./services/auth-gaurd.service";
 import { AdminGaurdService } from "./services/admin-gaurd.service";
 import { UnauthorizedComponent } from "./components/unauthorized/unauthorized.component";
 import { HomeComponent } from "./components/home/home.component";
+import { AddUserComponent } from "./components/add-user/add-user.component";
 
 const routes: Routes = [
   { path: "", component: LoginComponent },
@@ -20,18 +21,17 @@ const routes: Routes = [
   {
     path: "users",
     component: UsersComponent,
-    canActivate: [
-      AuthGaurdService
-      // , AdminGaurdService
-    ]
+    canActivate: [AuthGaurdService, AdminGaurdService]
+  },
+  {
+    path: "users/create",
+    component: AddUserComponent,
+    canActivate: [AuthGaurdService, AdminGaurdService]
   },
   {
     path: "attendance",
     component: AttendanceComponent,
-    canActivate: [
-      AuthGaurdService
-      //  , AdminGaurdService
-    ]
+    canActivate: [AuthGaurdService, AdminGaurdService]
   },
   {
     path: "unauthorized",

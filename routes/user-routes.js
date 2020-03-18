@@ -7,6 +7,8 @@ const { User } = require("./../models/models");
 const {
 	bookshelf: { knex }
 } = require("./../models/models");
+const admin = require("./../middleware/admin");
+
 const userSchema = Joi.object({
 	id: Joi.string(),
 	fullname: Joi.string()
@@ -39,7 +41,7 @@ function validateUser(userObject, res) {
 	return false;
 }
 
-router.get("/", (req, res, next) => {
+router.get("/", admin, (req, res, next) => {
 	//get users
 	const { ...queryString } = req.query;
 
@@ -57,8 +59,18 @@ router.get("/", (req, res, next) => {
 			.finally(() => next());
 	}
 
-	if (queryString.filter === "true") {
-		const { user } = queryString.user;
+	if (queryString.verify === "true") {
+		const { username } = queryString;
+		User.where({ username })
+			.fetch({ require: false })
+			.then(result => {
+				const available = result === null ? true : false;
+				res.locals.data = { available };
+			})
+			.catch(err => {
+				res.locals.data = { available: false };
+			})
+			.finally(() => next());
 	}
 
 	//if (queryString.hasOwnKey('aggregate')){
@@ -108,7 +120,9 @@ router.get("/", (req, res, next) => {
 	// 	});
 });
 
-router.get("/:id", (req, res, next) => {
+router.get("/verify", admin, (req, res, next) => {});
+
+router.get("/:id", admin, (req, res, next) => {
 	//get users
 	const userid = req.params.id;
 	User.where({ id: userid })

@@ -8,35 +8,53 @@
     aria-controls="navbarNav"
     aria-expanded="false"
     aria-label="Toggle navigation"
+    ngbButton
   >
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul ngbNav class="navbar-nav">
-      <li ngbNavItem class="nav-item active">
+      <li ngbNavItem class="nav-item" routerLinkActive="active">
         <a class="nav-link" [routerLink]="['home']"
           >Home <span class="sr-only">(current)</span></a
         >
       </li>
-      <li ngbNavItem class="nav-item">
+      <li
+        ngbNavItem
+        class="nav-item"
+        *ngIf="authService.isAdmin()"
+        routerLinkActive="active"
+      >
+        <a class="nav-link" [routerLink]="['dashboard']">Dashboard</a>
+      </li>
+      <li
+        ngbNavItem
+        class="nav-item"
+        *ngIf="authService.isAdmin()"
+        routerLinkActive="active"
+      >
         <a class="nav-link" [routerLink]="['users']">Users</a>
       </li>
-      <li ngbNavItem class="nav-item">
+      <li
+        ngbNavItem
+        class="nav-item"
+        *ngIf="authService.isAdmin()"
+        routerLinkActive="active"
+      >
         <a class="nav-link" [routerLink]="['attendance']">Attendance</a>
       </li>
-
-      <span class="navbar-text">
-        <div ngbDropdown>
-          <button id="forLogout" ngbDropdownToggle>
-            Welcome, {{ authService.currentUser.fullname }}
-          </button>
-          <div ngbDropdownMenu aria-labelledby="forLogout">
-            <button ngbDropdownItem (click)="authService.logout()">
-              Logout
-            </button>
-          </div>
-        </div>
-      </span>
     </ul>
   </div>
+
+  <span class="navbar-text my-2 my-lg-0">
+    Welcome, {{ authService.currentUser.name }}
+    <div ngbDropdown style="cursor: pointer;">
+      <fa-icon [icon]="faUser" id="forLogout" ngbDropdownToggle></fa-icon>
+      <div ngbDropdownMenu aria-labelledby="forLogout">
+        <button ngbDropdownItem (click)="authService.logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </span>
 </nav>

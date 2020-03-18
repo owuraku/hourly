@@ -1,0 +1,124 @@
+<div class="card">
+  <form [formGroup]="userForm" (ngSubmit)="addUser($event)">
+    <div class="card-header">
+      Add a user
+    </div>
+    <div class="card-content text-center container container-fluid">
+      <br />
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="">Username</label>
+            <input
+              name="username"
+              type="text"
+              class="form-control"
+              placeholder="Enter username"
+              [formControl]="username"
+            />
+            <div *ngIf="username.status === 'PENDING'">
+              Checking username...
+            </div>
+            <div class="text-success" *ngIf="username.status === 'VALID'">
+              Username is available!
+            </div>
+            <small
+              *ngIf="username.touched && username.invalid"
+              class="text-danger"
+            >
+              {{ getValidationErrorMessage(username) }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="">Fullname</label>
+            <input
+              name="fullname"
+              type="text"
+              class="form-control"
+              placeholder="Enter fullname"
+              [formControl]="fullname"
+            />
+            <small
+              *ngIf="fullname.touched && fullname.invalid"
+              class="text-danger"
+            >
+              {{ getValidationErrorMessage(fullname) }}
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="">Password</label>
+            <input
+              name="password"
+              type="password"
+              class="form-control"
+              placeholder="Enter password"
+              [formControl]="password"
+            />
+            <small
+              *ngIf="password.touched && password.invalid"
+              class="text-danger"
+            >
+              {{ getValidationErrorMessage(password) }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="">Re-enter Password</label>
+            <input
+              name="cpassword"
+              type="password"
+              class="form-control"
+              placeholder="Re-enter password"
+              [formControl]="cpassword"
+            />
+            <small
+              *ngIf="cpassword.touched && cpassword.invalid"
+              class="text-danger"
+            >
+              {{ getValidationErrorMessage(cpassword) }}
+            </small>
+            <small
+              *ngIf="cpassword.dirty && userForm.get('passwordConfirm').invalid"
+              class="text-danger"
+            >
+              Passowrds don't match
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="">Role</label>
+            <select name="role" class="form-control" [formControl]="role">
+              <option *ngFor="let role of roles" value="role">{{
+                role
+              }}</option>
+            </select>
+            <small *ngIf="role.touched && role.invalid" class="text-danger">
+              {{ getValidationErrorMessage(role) }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer text-center">
+      <button
+        type="submit"
+        [disabled]="userForm.invalid"
+        class="btn btn-primary btn-lg"
+      >
+        Save
+      </button>
+    </div>
+  </form>
+</div>
