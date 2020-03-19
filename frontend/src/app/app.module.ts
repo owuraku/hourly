@@ -14,7 +14,12 @@ import { NavbarComponent } from "./components/navbar/navbar.component";
 import { UnauthorizedComponent } from "./components/unauthorized/unauthorized.component";
 import { HomeComponent } from "./components/home/home.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { AddUserComponent } from './components/add-user/add-user.component';
+import { AddUserComponent } from "./components/add-user/add-user.component";
+import { ModalboxComponent } from "./modalbox/modalbox.component";
+import { ModalboxService } from "./modalbox/modalbox.service";
+import { ToastComponent } from "./toast/toast.component";
+import { ResourceService } from "./services/resource.service";
+import { FilterComponent } from './filter/filter.component';
 // import { JwtInterceptor } from "./services/auth-interceptor.service";
 
 function tokenGetter() {
@@ -40,7 +45,10 @@ const jwtConf = {
     NavbarComponent,
     UnauthorizedComponent,
     HomeComponent,
-    AddUserComponent
+    AddUserComponent,
+    ModalboxComponent,
+    ToastComponent,
+    FilterComponent
   ],
   imports: [
     BrowserModule,
@@ -52,9 +60,8 @@ const jwtConf = {
     HttpClientModule,
     JwtModule.forRoot(jwtConf)
   ],
-  providers: [
-    // { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
-  ],
+  providers: [ResourceService],
+  entryComponents: [ModalboxComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

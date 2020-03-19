@@ -7,7 +7,7 @@ import { AttendanceService } from "src/app/services/attendance.service";
   styleUrls: ["./attendance.component.sass"]
 })
 export class AttendanceComponent implements OnInit {
-  attendance: [];
+  attendance = [];
   collectionSize: number;
   page = 1;
   pageSize = 10;
@@ -15,12 +15,21 @@ export class AttendanceComponent implements OnInit {
   constructor(private attendanceService: AttendanceService) {}
 
   ngOnInit() {
-    this.getResults();
+    this.getResults(null);
   }
 
-  getResults() {
+  getResults(data: any | null) {
+    let user = data;
+    if (data != null) {
+      user = data.user;
+      user = user.id === 0 ? null : user.username;
+    }
     this.attendanceService
-      .getPaginatedResources({ page: this.page, pageSize: this.pageSize })
+      .getPaginatedResources({
+        page: this.page,
+        pageSize: this.pageSize,
+        search: user
+      })
       .subscribe((attendanceArray: any) => {
         this.attendance = attendanceArray.data.data;
         const paginator = attendanceArray.data.pagination;

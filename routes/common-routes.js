@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const { User } = require("./../models/models");
 
+const refreshTokens = [];
+
 const credentialsSchema = Joi.object({
 	username: Joi.string()
 		.required()
@@ -52,11 +54,16 @@ router.post("/login", async (req, res, next) => {
 					user.password
 				);
 				if (validPassword) {
+					res.locals.success = true;
 					res.locals.message = "Token retrieved";
-					res.locals.success = null;
-					res.locals.code = 200;
+					const accessToken = ruser.generateAccessToken();
+					const refreshToken = ruser.generateRefreshToken();
+					refreshTokens.push(refreshToken);
+					res.locals.data = {
+						accessToken,
+						refreshToken
+					};
 					//console.log(ruser);
-					res.locals.data = ruser.generateToken();
 					//res.locals.data = token;
 				}
 			} catch (error) {}

@@ -19,7 +19,9 @@ function auth(req, res, next) {
 			return next();
 		} catch (error) {
 			response.message = error.message;
-			response.code = 403;
+			if (error.name != "TokenExpiredError") {
+				response.code = 403;
+			}
 			res.status(response.code).send(response);
 		}
 	}

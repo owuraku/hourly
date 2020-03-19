@@ -1,17 +1,22 @@
-import { Injectable } from "@angular/core";
+import { Injectable, Injector } from "@angular/core";
 import { ResourceService } from "./resource.service";
 import { HttpClient } from "@angular/common/http";
 import { API_URL_BASE } from "./../../environments/custom";
-import { retry, catchError, map, switchMap } from "rxjs/operators";
+import { retry, catchError, map } from "rxjs/operators";
 import { of } from "rxjs";
+import { ModalboxService } from "../modalbox/modalbox.service";
 const resourceUrl = "users";
 
 @Injectable({
   providedIn: "root"
 })
 export class UsersService extends ResourceService {
-  constructor(http: HttpClient, private thisHttp: HttpClient) {
-    super(http, resourceUrl);
+  constructor(
+    http: HttpClient,
+    private thisHttp: HttpClient,
+    ms: ModalboxService
+  ) {
+    super(http, resourceUrl, ms);
   }
 
   findUser(username: string) {

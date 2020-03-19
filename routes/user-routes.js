@@ -101,23 +101,6 @@ router.get("/", admin, (req, res, next) => {
 		})
 		.catch(err => (res.locals.error = err))
 		.finally(() => next());
-
-	//}
-
-	// User.collection()
-	// 	.fetch()
-	// 	.then(users => {
-	// 		res.locals.data = users;
-	// 		res.locals.message = "Users retrieved successfully";
-	// 	})
-	// 	.catch(err => {
-	// 		res.locals.success = false;
-	// 		res.locals.message = err;
-	// 		res.locals.code = 500;
-	// 	})
-	// 	.finally(() => {
-	// 		next();
-	// 	});
 });
 
 router.get("/verify", admin, (req, res, next) => {});

@@ -43,8 +43,8 @@ function validateAttendance(attendance, res) {
 	return false;
 }
 
-router.get("/", admin, (req, res, next) => {
-	const { ...queryString } = req.query;
+router.get("/", admin, async (req, res, next) => {
+	const { ...queryString } = await req.query;
 
 	//to filter statistical data
 	if (queryString.filter === "true") {
@@ -60,7 +60,7 @@ router.get("/", admin, (req, res, next) => {
 				.max("clockin as latestEntryTime")
 				.min("clockout as earliestExitTime")
 				.max("clockout as latestExitTime")
-				.whereBetween("date", [toDate, fromDate])
+				.whereBetween("date", [fromDate, toDate])
 				.groupBy("users.id")
 				.select("fullname", "username", "user_id")
 				.select(
@@ -79,6 +79,7 @@ router.get("/", admin, (req, res, next) => {
 		})
 			.fetchAll()
 			.then(r => {
+				console.log(r);
 				res.locals.data = r;
 			})
 			.catch(err => setErrors(err, res))
@@ -103,13 +104,19 @@ router.get("/", admin, (req, res, next) => {
 
 	//for pagination
 	if (queryString.paginate === "true") {
+		if (queryString.search !== "false") {
+			attendanceQuery.where("users.username", "=", queryString.search);
+		}
+
 		attendanceQuery
+			.orderBy("date", "asc")
 			.fetchPage({ page: queryString.page, pageSize: queryString.pageSize })
 			.then(attendance => {
 				const data = {
 					data: attendance.toJSON(),
 					pagination: attendance.pagination
 				};
+				console.log(data);
 				res.locals.data = data; //.mask("*,user(id,fullname)");
 				res.locals.message = "Attendance retrieved successfully";
 			})
@@ -137,11 +144,8 @@ router.get("/:id", (req, res, next) => {
 	res.send("a user" + req.params.id);
 });
 
+//record attendance
 router.post("/", (req, res, next) => {
-	//add user
-	//get user data from req
-	//validate user
-	//save to database
 	const data = req.body;
 	const attendance = {
 		user_id: req.user.id,

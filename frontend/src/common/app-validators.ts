@@ -6,7 +6,7 @@ export class AppValidators {
     let valid = true;
     for (const key in formGroup.controls) {
       if (formGroup.controls.hasOwnProperty(key)) {
-        const control: FormControl = formGroup.controls[key] as FormControl;
+        const control = formGroup.controls[key] as FormControl;
 
         if (value === undefined) {
           value = control.value;

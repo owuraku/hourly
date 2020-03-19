@@ -11,7 +11,7 @@ const User = bookshelf.model("User", {
 	mask: {
 		nameOnly: "fullname"
 	},
-	generateToken() {
+	generateAccessToken() {
 		return jwt.sign(
 			{
 				name: this.attributes.fullname,
@@ -19,7 +19,19 @@ const User = bookshelf.model("User", {
 				id: this.attributes.id
 			},
 			process.env.APP_KEY ||
-				"$2b$10$cae294uO/E3sMcKTMPfPLuXkPRsJqVTpEA0UyN2Smpis01AY1EJgy"
+				"$2b$10$cae294uO/E3sMcKTMPfPLuXkPRsJqVTpEA0UyN2Smpis01AY1EJgy",
+			{ expiresIn: "10m" }
+		);
+	},
+	generateRefreshToken() {
+		return jwt.sign(
+			{
+				name: this.attributes.fullname,
+				role: this.attributes.role,
+				id: this.attributes.id
+			},
+			process.env.REFRESH_KEY ||
+				"$2b$10$cae294uO/E3sMTEHieTYUEPRsJqVTpEA0UyN2Sm73UIlAY1EJgy"
 		);
 	}
 });

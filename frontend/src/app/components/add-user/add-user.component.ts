@@ -9,6 +9,7 @@ import {
 import { UsersService } from "src/app/services/users.service";
 import ValidationErrorMessages from "src/common/validators";
 import { AppValidators } from "src/common/app-validators";
+import { ModalboxService } from "src/app/modalbox/modalbox.service";
 
 @Component({
   selector: "app-add-user",
@@ -18,7 +19,11 @@ import { AppValidators } from "src/common/app-validators";
 export class AddUserComponent implements OnInit {
   roles = ["Normal", "Admin"];
   userForm: FormGroup;
-  constructor(private fb: FormBuilder, private userService: UsersService) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UsersService,
+    private modalService: ModalboxService
+  ) {
     this.userForm = fb.group({
       username: [
         "",
@@ -29,7 +34,7 @@ export class AddUserComponent implements OnInit {
         "",
         [Validators.required, Validators.minLength(6), Validators.max(50)]
       ],
-      role: ["", [Validators.required]],
+      role: ["Normal", [Validators.required]],
       passwordConfirm: new FormGroup(
         {
           password: new FormControl("", [
@@ -48,7 +53,9 @@ export class AddUserComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.modalService.openModal("Test", "It worked");
+  }
 
   get username() {
     return this.userForm.controls.username as FormControl;
@@ -67,7 +74,7 @@ export class AddUserComponent implements OnInit {
   }
 
   get role() {
-    return this.userForm.controls["role"] as FormControl;
+    return this.userForm.controls.role as FormControl;
   }
 
   uniqueUsername(control: AbstractControl) {
@@ -77,6 +84,18 @@ export class AddUserComponent implements OnInit {
   }
 
   addUser($event) {
+    if (this.userForm.valid) {
+      const data = this.userForm.value;
+      data.password = data.passwordConfirm.password;
+      data.confirm_password = data.passwordConfirm.cpassword;
+      delete data.passwordConfirm;
+      this.userService.addResource(data).subscribe(user => {
+        if (user) {
+          $event.currentTarget.reset();
+          this.userForm.reset();
+        }
+      });
+    }
     console.log(this.userForm);
   }
 

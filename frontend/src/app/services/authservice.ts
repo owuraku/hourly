@@ -37,7 +37,8 @@ export class AuthService {
       }),
       map((response: ResponseStructure) => {
         if (response.success) {
-          localStorage.setItem("access_token", response.data);
+          localStorage.setItem("access_token", response.data.accessToken);
+          localStorage.setItem("refresh_token", response.data.refreshToken);
         }
         return response.success;
       })
@@ -62,6 +63,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem("access_token");
+    this.http.post().subscribe(result => {});
     this.router.navigate(["/"]);
   }
 }

@@ -100,7 +100,7 @@
           <div class="form-group">
             <label for="">Role</label>
             <select name="role" class="form-control" [formControl]="role">
-              <option *ngFor="let role of roles" value="role">{{
+              <option *ngFor="let role of roles" [value]="role">{{
                 role
               }}</option>
             </select>
